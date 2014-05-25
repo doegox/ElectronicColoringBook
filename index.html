@@ -292,6 +292,40 @@ Let's take our original example, this time XORed with a key of 5 chars instead o
 <p>`ElectronicColoringBook.py test3.bin -b 5 -g 3 -p 3 -o 3</p>
 
 <p><img src="./images/test3.bin.2.png" alt="test3.bin.2"></p>
+
+<h3>
+<a name="not-only-ecb-anything" class="anchor" href="#not-only-ecb-anything"><span class="octicon octicon-link"></span></a>Not only ECB: anything</h3>
+
+<p>Actually we can use the tool to colorize whatever we want and reveal some structures.
+E.g. applied on /bin/ls on an amd64 arch, this gives:</p>
+
+<pre><code>ElectronicColoringBook.py /bin/ls -b1 -m2
+00      28929 #FF -&gt; #FF #FF #FF
+ff       5648 #1F -&gt; #CC #9C #28
+48       3727 #EB -&gt; #CC #28 #75
+20       3566 #C7 -&gt; #97 #28 #CC
+89       2258 #04 -&gt; #CC #34 #28
+0f       2127 #D3 -&gt; #C5 #28 #CC
+41       1847 #F3 -&gt; #CC #28 #57
+8b       1560 #AD -&gt; #33 #28 #CC
+24       1356 #05 -&gt; #CC #38 #28
+40       1288 #F6 -&gt; #CC #28 #4B
+44       1261 #CB -&gt; #A6 #28 #CC
+83       1224 #9B -&gt; #28 #63 #CC
+74       1223 #B5 -&gt; #51 #28 #CC
+01       1208 #6A -&gt; #28 #CC #77
+4c       1187 #C7 -&gt; #97 #28 #CC
+**      51583 #00 -&gt; #00 #00 #00
+Trying to guess ratio between 1:2 and 2:1 ...
+Width: from 165 to 662
+Sampling: 1000
+Progress: 200 300 400 500 600 
+Size:  (384, 286)
+</code></pre>
+
+<p>We get a byte histogram, and a graphical representation:</p>
+
+<p><img src="./images/test4.bin.1.png" alt="test4.bin.1"></p>
       </section>
     </div>
 
