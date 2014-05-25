@@ -14,36 +14,29 @@
 import sys, math, random
 from PIL import Image
 import operator
+from optparse import OptionParser
 
-# How many ECB to colorize?
-colors=16
+options = OptionParser(usage='%prog [options] file', description='Colorize data file according to repetitive chunks, typical in ECB encrypted data')
+options.add_option('-c', '--colors', type='int', default=16, help='Number of colors to use')
+options.add_option('-b', '--blocksize', type='int', default=16, help='Blocksize to consider, in bytes')
+options.add_option('-g', '--groups', type=int, default=1, help='Groups of N blocks e.g. when blocksize is not multiple of underlying data')
+options.add_option('-r', '--ratio', default="4:3", help='Ratio of output image')
+options.add_option('-f', '--flip', action="store_true", default=False, help='Flip image top<>bottom')
 
-assert len(sys.argv) >= 2
-f=open(sys.argv[1], 'rb')
+opts, args = options.parse_args()
+if len(args) < 1:
+    options.print_help()
+    sys.exit()
+
+f=open(args[0], 'rb')
 content=f.read()
 ciphertext=content
 
-if len(sys.argv) > 2:
-  colors=int(sys.argv[2])
-else:
-  colors=16
-
-if len(sys.argv) > 3:
-  blocksize=int(sys.argv[3])
-else:
-  blocksize=16
-
-ratio=(4,3)
-if len(sys.argv) > 4:
-  ratio=tuple(map(int, sys.argv[4].split(':')))
-
-groups=1
-if len(sys.argv) > 5:
-  groups=int(sys.argv[5])
+ratio=tuple(map(int, opts.ratio.split(':')))
 
 d={}
-for i in range(len(ciphertext)/blocksize):
-    token=ciphertext[i*blocksize:(i+1)*blocksize].encode('hex')
+for i in range(len(ciphertext)/opts.blocksize):
+    token=ciphertext[i*opts.blocksize:(i+1)*opts.blocksize].encode('hex')
     if token not in d:
         d[token]=1
     else:
@@ -51,32 +44,32 @@ for i in range(len(ciphertext)/blocksize):
 
 sorted_d = sorted(d.iteritems(), key=operator.itemgetter(1), reverse=True)
 
-sorted_d=sorted_d[:(colors-1)*groups]
+sorted_d=sorted_d[:(opts.colors-1)*opts.groups]
 sorted_d=filter(lambda x: x[1]>1, sorted_d)
-sorted_d=sorted_d[:len(sorted_d)/groups*groups]
+sorted_d=sorted_d[:len(sorted_d)/opts.groups*opts.groups]
 if not sorted_d:
     raise NameError("Did not find any single match :-(")
 mode="RGBA"
 pxsize=4 # RGBA: 4 bytes per pixel
-pxblocksize=max(blocksize/pxsize, 1)
+pxblocksize=max(opts.blocksize/pxsize, 1)
 A="\xFF" # Alpha channel, if any
 # Let's use random colors...
 colormap={}
-for i in range(len(sorted_d)/groups):
+for i in range(len(sorted_d)/opts.groups):
     if i == 0:
         outtoken=("\xff\xff\xff" + A)* pxblocksize # white
     else:
         outtoken=(chr(random.randint(1,254)) + chr(random.randint(1,254)) + chr(random.randint(1,254)) + A) * pxblocksize
-    for g in range(groups):
-        gi =(i*groups)+g
+    for g in range(opts.groups):
+        gi =(i*opts.groups)+g
         colormap[sorted_d[gi][0]]=outtoken
         print "%s %10s #%s" % (sorted_d[gi][0], sorted_d[gi][1], colormap[sorted_d[gi][0]][:3].encode('hex'))
-blocksleft=len(ciphertext)/blocksize-reduce(lambda x, y: x+y, [n for (t, n) in sorted_d])
+blocksleft=len(ciphertext)/opts.blocksize-reduce(lambda x, y: x+y, [n for (t, n) in sorted_d])
 print "%s %10i #%s" % ("*" * len(sorted_d[0][0]), blocksleft, "000000")
 
 out=""
-for i in range(len(ciphertext)/blocksize):
-    token=ciphertext[i*blocksize:(i+1)*blocksize].encode('hex')
+for i in range(len(ciphertext)/opts.blocksize):
+    token=ciphertext[i*opts.blocksize:(i+1)*opts.blocksize].encode('hex')
     if token in colormap:
         out+=colormap[token]
     else:
@@ -87,6 +80,7 @@ y=x/ratio[0]*ratio[1]
 xy=(int(x), int(y))
 print "Size: ", repr(xy)
 i=Image.fromstring(mode, xy,out)
-#i=i.transpose(Image.FLIP_TOP_BOTTOM)
-i.save(sys.argv[1]+'.ecb_%i.png' % colors)
+if opts.flip:
+    i=i.transpose(Image.FLIP_TOP_BOTTOM)
+i.save(args[0]+'.ecb_%i.png' % opts.colors)
 i.show()
