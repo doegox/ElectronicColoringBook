@@ -99,7 +99,7 @@ A striking example of the degree to which ECB can leave plaintext data patterns 
 </li>
 </ul><p>Let's see:</p>
 
-<p><code>ecb-colorize.py test.bin</code></p>
+<p><code>ElectronicColoringBook.py test.bin</code></p>
 
 <p><img src="./images/test.bin.2.png" alt="test.bin.2"></p>
 
@@ -107,7 +107,7 @@ A striking example of the degree to which ECB can leave plaintext data patterns 
 
 <p>Image is too wide but, given the pixel width, the ratio was correctly recovered and the lines properly wrapped. So we need to adjust the pixel width to compress horizontally the image:</p>
 
-<p><code>ecb-colorize.py test.bin --pixelwidth=3</code></p>
+<p><code>ElectronicColoringBook.py test.bin --pixelwidth=3</code></p>
 
 <p><img src="./images/test.bin.3.png" alt="test.bin.3"></p>
 
@@ -147,14 +147,14 @@ b52adc1063add22fe924ef3b1f6455f7        109 #FE -&gt; #CC #28 #2C
 
 <p>So let's do it:</p>
 
-<p><code>ecb-colorize.py test.bin -p 3 --group=3</code></p>
+<p><code>ElectronicColoringBook.py test.bin -p 3 --group=3</code></p>
 
 <p><img src="./images/test.bin.4.png" alt="test.bin.4"></p>
 
 <p>Still one more thing: Pluto's tail is wrapped, that's because before the real data there is the image header (here a PPM header) and in this case a salt because of the way we used openssl.
 So we can apply a small offset to skip them. As we're working with blocks it can't be perfect. Here best is to skip two blocks, so 32 bytes:</p>
 
-<p><code>ecb-colorize.py test.bin -p 3 -g 3 --offset=2</code></p>
+<p><code>ElectronicColoringBook.py test.bin -p 3 -g 3 --offset=2</code></p>
 
 <p><img src="./images/test.bin.5.png" alt="test.bin.5"></p>
 
@@ -179,11 +179,11 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 
 <p>AES blocksize is 16, DES blocksize is 8, but e.g. I've also used the tool against lists of SHA-1 (20 bytes). If you doubt about which blocksize to use, try small values then larger ones to merge repreating vertical stripes. But don't forget to play also with groups other wise you'll lose in resolution.</p>
 
-<p><code>ecb-colorize.py test.bin --blocksize=3 -p 3 -o 10</code></p>
+<p><code>ElectronicColoringBook.py test.bin --blocksize=3 -p 3 -o 10</code></p>
 
 <p><img src="./images/test.bin.6.png" alt="test.bin.6"></p>
 
-<p><code>ecb-colorize.py test.bin --blocksize=48 -p 3 -o 1</code></p>
+<p><code>ElectronicColoringBook.py test.bin --blocksize=48 -p 3 -o 1</code></p>
 
 <p><img src="./images/test.bin.7.png" alt="test.bin.7"></p>
 
@@ -259,16 +259,39 @@ But remember adjusting pixelwidth will bring you closer to correct ratio too.</p
 <p>In rare cases, ratio is almost guessed but not entirely correct. This happens e.g. when width is not an entire multiple of blocksize.
 Here is a BMP encrypted: <a href="./images/test2.bin">test2.bin</a></p>
 
-<p><code>../ecb-colorize.py test2.bin -p 4 -f</code></p>
+<p><code>ElectronicColoringBook.py test2.bin -m 4 --raw</code></p>
+
+<p><img src="./images/test2.bin.1.png" alt="test2.bin.1"></p>
+
+<p><code>ElectronicColoringBook.py test2.bin -p 4 -f</code></p>
 
 <p><img src="./images/test2.bin.2.png" alt="test2.bin.2"></p>
 
 <p>Ratio is almost correct. Tool tells us the dimensions are 1500x391
 Let's tune them slightly:</p>
 
-<p><code>../ecb-colorize.py test2.bin -p 4 -f -x 1501 -o 5</code></p>
+<p><code>ElectronicColoringBook.py test2.bin -p 4 -f -x 1501 -o 5</code></p>
 
 <p><img src="./images/test2.bin.3.png" alt="test2.bin.3"></p>
+
+<p>And indeed 1501 is not a multiple of 16.</p>
+
+<h3>
+<a name="not-only-ecb-xor" class="anchor" href="#not-only-ecb-xor"><span class="octicon octicon-link"></span></a>Not only ECB: XOR</h3>
+
+<p>Actually the tool can be useful in some other cases, e.g. for XORed files.
+Let's take our original example, this time XORed with a key of 5 chars instead of AES-encrypted: 
+<a href="./images/test3.bin">test3.bin</a></p>
+
+<p><code>ElectronicColoringBook.py test3.bin --raw</code></p>
+
+<p><img src="./images/test3.bin.1.png" alt="test3.bin.1"></p>
+
+<p>Blocksize=5 as XOR key is 5-byte long, pixelwidth is 3 bytes so we'll have to group them by 3 as 3 and 5 are coprimes, and finally a little offset to get rid of the header:</p>
+
+<p>`ElectronicColoringBook.py test3.bin -b 5 -g 3 -p 3 -o 3</p>
+
+<p><img src="./images/test3.bin.2.png" alt="test3.bin.2"></p>
       </section>
     </div>
 
