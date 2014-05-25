@@ -9,8 +9,6 @@
 # Image size and aspect will only be respected if blocksize is multiple of 4
 
 # TODO: propose other colormaps
-# TODO guess ratio based on all colors but black (x==y and x != 0xff), on real pixelsize (1501), use out instead of outmap
-#   or fill colormap with black and in ratio test x==y and x < #colors
 # TODO raw = -b 1 -c 256 -g 1
 # TODO raw colormap, not based on histo
 
@@ -27,7 +25,8 @@ options.add_option('-g', '--groups', type=int, default=1, help='Groups of N bloc
 options.add_option('-r', '--ratio', help='Ratio of output image')
 options.add_option('-x', '--width', type='int', help='Width of output image')
 options.add_option('-y', '--height', type='int', help='Height of output image')
-options.add_option('-s', '--step', type='int', default=100, help='Step when guessing image size. Smaller is slower but more precie, default=100')
+options.add_option('-s', '--sampling', type='int', default=1000, help='Sampling when guessing image size. Smaller is slower but more precise, default=1000')
+options.add_option('-m', '--maxratio', type='int', default=3, help='Max ratio to test when guessing image size. E.g. default=3 means testing ratios from 1:3 to 3:1')
 options.add_option('-o', '--offset', type='int', default=0, help='Offset to skip original header, in number of blocks')
 options.add_option('-f', '--flip', action="store_true", default=False, help='Flip image top<>bottom')
 options.add_option('-p', '--pixelwidth', type='int', default=1, help='How many bytes per pixel in the original image')
@@ -118,29 +117,25 @@ for i in range(len(ciphertext)/opts.blocksize):
         out+=byte
 
 if opts.width is None and opts.height is None and opts.ratio is None:
-    M=3
-    print "Trying to guess ratio between 1:%i and %i:1 ..." % (M, M)
+    print "Trying to guess ratio between 1:%i and %i:1 ..." % (opts.maxratio, opts.maxratio)
 
-    outmap=[]
-    for i in range(len(ciphertext)/opts.blocksize):
-        token=ciphertext[i*opts.blocksize:(i+1)*opts.blocksize].encode('hex')
-        outmap+=['\xFF' if token == histo[0][0] else '\x00']
-    # outmap is now a condensed view of the data where a 0xff byte represents most common block and 0x00 the other blocks
-    sq=int(math.sqrt(len(outmap)/opts.blocksize*opts.pixelwidth))
+    sq=int(math.sqrt(len(out)))
     r={}
-    print "Width: from %i to %i\nStep: %i\nProgress:" % (sq/M*opts.blocksize/opts.pixelwidth, sq*M*opts.blocksize/opts.pixelwidth, opts.step),
-    for i in range(sq/M,sq*M):
+    print "Width: from %i to %i\nSampling: %i\nProgress:" % (sq/opts.maxratio, sq*opts.maxratio, opts.sampling),
+    for i in range(sq/opts.maxratio,sq*opts.maxratio):
         if i % 100 == 0:
-           print i*opts.blocksize/opts.pixelwidth,
+           print i,
            sys.stdout.flush()
-        A=outmap[:-i:opts.step]
-        B=outmap[i::opts.step]
+        A=out[:-i:opts.sampling]
+        B=out[i::opts.sampling]
         # How many matches?
+# Shall we skip matches between black blocks?
+#        m=reduce(lambda x,y: x+y,[x and x==y for (x,y) in zip(A,B)])
         m=reduce(lambda x,y: x+y,[x==y for (x,y) in zip(A,B)])
         r[i]=float(m)/(len(A))
     print ""
     r=sorted(r.iteritems(), key=operator.itemgetter(1), reverse=True)
-    opts.width = int(r[0][0]*float(opts.blocksize)/opts.pixelwidth)
+    opts.width = r[0][0]
 
 if opts.ratio is not None:
     # Compute ratio
