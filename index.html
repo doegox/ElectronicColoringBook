@@ -52,23 +52,27 @@ A striking example of the degree to which ECB can leave plaintext data patterns 
 <p>Those ECB exemplary images are made artificially: the author knows the original file format (width, height, pixel encoding) and typically overwrites the encrypted header with the original one.</p>
 
 <p>But when a file is encrypted and you don't know anything about it, it's not that simple.
-<br>One example is the 300 points challenge of the <em>2014 Nuit du Hack CTF Quals</em> called <em>The Another One</em>. All you get is an encrypted BMP (as you can guess from the file extension). More details on the resolution of that challenge are available <a href="http://wiki.yobi.be/wiki/NDH_Writeups#Another_One">here</a>.
-It appears quickly that there are recurring encrypted blocks but practical problems are to recover the unknown parameters:</p>
+<br>One example is the 300 points challenge of the <em>2014 Nuit du Hack CTF Quals</em> called <em>The Another One</em>. All you get is an encrypted BMP (as you can guess from the file extension). More details on the resolution of that challenge are available <a href="http://wiki.yobi.be/wiki/NDH_Writeups#Another_One">here</a>.</p>
+
+<p>It appears quickly that there are recurring encrypted blocks but practical problems are to recover the unknown parameters:</p>
 
 <ul>
 <li>width and height of the image</li>
 <li>pixel encoding. Here it's a BMP but BMP can <a href="https://en.wikipedia.org/wiki/BMP_file_format#Pixel_format">encode each pixel</a> in 1 bit, 2 bits, 4 bits, 8 bits, 16 bits, 24 bits or 32 bits so that doesn't really help.</li>
 <li>layout. Here it's a BMP so starting from bottom left to top right, line by line.</li>
-</ul><p>Pixel encoding, width and height link back to the total file size:
-<em>header + width * height * bytes_per_pixel</em></p>
+</ul><p>Pixel encoding, width and height link back to the total encrypted file size:</p>
 
-<p>Here is another example we'll walk through. For the record the binary blob was created from some ppm (as we need a non-compressed bitmap to start with) as:
-<code>openssl enc -e -aes-128-ecb -in test.ppm -out test.bin -k toto</code>
-test.bin is available <a href="/images/test.bin">here</a></p>
+<p><em>header + width * height * bytes_per_pixel + padding = filesize</em></p>
+
+<p>Here is another example we'll walk through. For the record the binary blob was created from some ppm (as we need a non-compressed bitmap to start with) as:</p>
+
+<p><code>openssl enc -e -aes-128-ecb -in test.ppm -out test.bin -k toto</code></p>
+
+<p>test.bin is available <a href="./images/test.bin">here</a></p>
 
 <p>At first we'll use a square ratio and color each byte.</p>
 
-<p><img src="./images/test.bin.1.png%20%20=400x" alt=""></p>
+<p><img src="./images/test.bin.1.png" alt="test.bin.1"></p>
 
 <p>Nothing really recognizable, isn't it?</p>
       </section>
