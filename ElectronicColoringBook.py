@@ -9,6 +9,10 @@
 # Image size and aspect will only be respected if blocksize is multiple of 4
 
 # TODO: propose other colormaps
+# TODO guess ratio based on all colors but black (x==y and x != 0xff), on real pixelsize (1501), use out instead of outmap
+#   or fill colormap with black and in ratio test x==y and x < #colors
+# TODO raw = -b 1 -c 256 -g 1
+# TODO raw colormap, not based on histo
 
 import sys, math, random
 from PIL import Image
@@ -83,7 +87,7 @@ p=[int(pp*255) for pp in p]
 #j.putpalette(p)
 #j.show()
 
-# Let's use random colors...
+# Let's use random colors = random refs to the colormap...
 colormap={}
 for i in range(len(histo)/opts.groups):
     if i == 0:
@@ -95,12 +99,12 @@ for i in range(len(histo)/opts.groups):
         colormap[histo[gi][0]]=chr(color)
         print "%s %10s #%02X -> #%02X #%02X #%02X" % (histo[gi][0], histo[gi][1], color, p[color*3], p[(color*3)+1], p[(color*3)+2])
 blocksleft=len(ciphertext)/opts.blocksize-reduce(lambda x, y: x+y, [n for (t, n) in histo])
-color=0 # black
+# All other blocks will be painted in black:
+color=0
 print "%s %10i #%02X -> #%02X #%02X #%02X" % ("*" * len(histo[0][0]), blocksleft, color, p[color*3], p[(color*3)+1], p[(color*3)+2])
 
 # Construct output stream
 out=""
-outlen=0
 outlenfloat=0.0
 for i in range(len(ciphertext)/opts.blocksize):
     token=ciphertext[i*opts.blocksize:(i+1)*opts.blocksize].encode('hex')
@@ -109,11 +113,9 @@ for i in range(len(ciphertext)/opts.blocksize):
     else:
         byte=chr(color)
     out+=byte*(opts.blocksize/opts.pixelwidth)
-    outlen+=opts.blocksize/opts.pixelwidth
     outlenfloat+=float(opts.blocksize)/opts.pixelwidth
-    if outlenfloat >= outlen + 1:
+    if outlenfloat >= len(out) + 1:
         out+=byte
-        outlen+=1
 
 if opts.width is None and opts.height is None and opts.ratio is None:
     M=3
