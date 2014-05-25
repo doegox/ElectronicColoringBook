@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
-# Usage: ElectronicColoringBook file [colors [blocksize [ratio]]] groups
-# default blocksize is 16
-# default number of colors is 16
-# groups: group n tokens together, useful e.g. when 3-byte RGB don't match 16-byte blocksize -> 3 types of equivalent token to paint in the same color
-# Most common ECB will be painted in white
-# All but (color-1) ECB will be painted in black
-# Image size and aspect will only be respected if blocksize is multiple of 4
+# See usage and examples on the project page:
+# https://doegox.github.io/ElectronicColoringBook/
+# This toy is released under the WTFPL (Do What the Fuck You Want to Public License).
+# Copyright (C) 2014 Philippe Teuwen <phil teuwen org>
 
 # TODO: propose other colormaps
+# TODO: don't systematically try to save images, it could fail
 
 import sys, math, random
 from PIL import Image
