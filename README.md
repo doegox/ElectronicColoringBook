@@ -21,6 +21,9 @@ Options:
   -h, --help            show this help message and exit
   -c COLORS, --colors=COLORS
                         Number of colors to use, default=16
+  -C COLORIZE, --colorize=COLORIZE
+                        Provide list of colors to be used, as hex byte indexes
+                        to a rainbow palette, FF=white, 00=black
   -b BLOCKSIZE, --blocksize=BLOCKSIZE
                         Blocksize to consider, in bytes, default=16
   -g GROUPS, --groups=GROUPS
