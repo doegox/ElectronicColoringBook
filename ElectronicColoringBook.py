@@ -18,7 +18,7 @@ options = OptionParser(usage='%prog [options] file', description='Colorize data 
 options.add_option('-c', '--colors', type='int', default=16, help='Number of colors to use, default=16')
 options.add_option('-b', '--blocksize', type='int', default=16, help='Blocksize to consider, in bytes, default=16')
 options.add_option('-g', '--groups', type=int, default=1, help='Groups of N blocks e.g. when blocksize is not multiple of underlying data, default=1')
-options.add_option('-r', '--ratio', help='Ratio of output image')
+options.add_option('-r', '--ratio', help='Ratio of output image, e.g. -r 4:3')
 options.add_option('-x', '--width', type='int', help='Width of output image')
 options.add_option('-y', '--height', type='int', help='Height of output image')
 options.add_option('-s', '--sampling', type='int', default=1000, help='Sampling when guessing image size. Smaller is slower but more precise, default=1000')
@@ -27,6 +27,9 @@ options.add_option('-o', '--offset', type='int', default=0, help='Offset to skip
 options.add_option('-f', '--flip', action="store_true", default=False, help='Flip image top<>bottom')
 options.add_option('-p', '--pixelwidth', type='int', default=1, help='How many bytes per pixel in the original image')
 options.add_option('-R', '--raw', action="store_true", default=False, help='Display raw image in 256 colors')
+options.add_option('-S', '--save', action="store_true", default=False, help='Save a copy of the produced image')
+options.add_option('-O', '--output', help='Change default output location prefix, e.g. -O /tmp/mytest. Implies -S')
+options.add_option('-D', '--dontshow', action="store_true", default=False, help='Don\'t display image')
 
 def histogram(data, blocksize):
     d={}
@@ -59,6 +62,9 @@ if opts.raw is True and (opts.colors != 16 or opts.blocksize != 16 or opts.group
     # Testing against default values to guess if user mixed options...
     print "Please don't mix -R with -b, -c, -g or -p!"
     sys.exit()
+
+if opts.output:
+    opts.save = True
 
 with open(args[0], 'rb') as f:
     f.read(opts.offset * opts.blocksize)
@@ -173,5 +179,19 @@ i.putpalette(p)
 
 if opts.flip:
     i=i.transpose(Image.FLIP_TOP_BOTTOM)
-i.save(args[0]+'.ecb_c%i_b%i.png' % (opts.colors, opts.blocksize))
-i.show()
+if opts.save:
+    if not opts.output:
+        opts.output=args[0]
+    if opts.raw:
+        suffix=".raw"
+    else:
+        suffix=".b%i_p%i_c%i" % (opts.blocksize, opts.pixelwidth, opts.colors)
+        if opts.groups != 1:
+            suffix+="_g%i" % opts.groups
+    if opts.offset != 0:
+        suffix+="_o%i" % opts.offset
+    suffix+="_x%i_y%i" % xy
+    print "Saving output into "+opts.output+suffix+'.png'
+    i.save(opts.output+suffix+'.png')
+if not opts.dontshow:
+    i.show()

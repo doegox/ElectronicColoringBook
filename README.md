@@ -44,4 +44,9 @@ Options:
   -p PIXELWIDTH, --pixelwidth=PIXELWIDTH
                         How many bytes per pixel in the original image
   -R, --raw             Display raw image in 256 colors
+  -S, --save            Save a copy of the produced image
+  -O OUTPUT, --output=OUTPUT
+                        Change default output location prefix, e.g. -O
+                        /tmp/mytest. Implies -S
+  -D, --dontshow        Don't display image
 ```
