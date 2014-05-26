@@ -302,6 +302,34 @@ But remember adjusting pixelwidth will bring you closer to correct ratio too.</p
 
 <p><img src="./images/test.bin.8.png" alt="test.bin.8"></p>
 
+<h3>
+<a name="--save" class="anchor" href="#--save"><span class="octicon octicon-link"></span></a>--save</h3>
+
+<pre><code>  -S, --save            Save a copy of the produced image
+</code></pre>
+
+<p>By default the tool doesn't save produced images, but you can ask for it.</p>
+
+<h3>
+<a name="--output" class="anchor" href="#--output"><span class="octicon octicon-link"></span></a>--output</h3>
+
+<pre><code>  -O OUTPUT, --output=OUTPUT
+                        Change default output location prefix, e.g. -O
+                        /tmp/mytest. Implies -S
+</code></pre>
+
+<p>Default storage location is to reuse input file location and name, and appending some parameters to its name, e.g.: /mypath/test.bin.b16_p3_c16_g3_x1600_y3200.png</p>
+
+<p>You can change storage location, e.g. <code>-O /tmp/mytest</code> will generate /tmp/mytest.b16_p3_c16_g3_x1600_y3200.png</p>
+
+<h3>
+<a name="--dontshow" class="anchor" href="#--dontshow"><span class="octicon octicon-link"></span></a>--dontshow</h3>
+
+<pre><code>  -D, --dontshow        Don't display image
+</code></pre>
+
+<p>Useful for batching process or if you're not running under X</p>
+
 <hr><h2>
 <a name="back-to-that-ctf-challenge" class="anchor" href="#back-to-that-ctf-challenge"><span class="octicon octicon-link"></span></a>Back to that CTF challenge</h2>
 
