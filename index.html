@@ -167,6 +167,12 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 
 <p><img src="./images/test.bin.5.png" alt="test.bin.5"></p>
 
+<p>You can even go as far as telling which colors to use:</p>
+
+<p><code>ElectronicColoringBook.py test.bin -p 3 -g 3 -o 2 -C FF002BE11E1B181E1719F01E1A1EF01C1E1C1A1E1E1C1E1E00</code></p>
+
+<p><img src="./images/test.bin.9.png" alt="test.bin.9"></p>
+
 <p>And <em>voilà!</em></p>
 
 <p>Now you understand better the name of our tool, Electronic Coloring Book :-)</p>
@@ -184,6 +190,16 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 </code></pre>
 
 <p>Maximum number of colors to use is 256. Minimum is 2. Tune it for the best effect.</p>
+
+<h3>
+<a name="--colorize" class="anchor" href="#--colorize"><span class="octicon octicon-link"></span></a>--colorize</h3>
+
+<pre><code>  -C COLORIZE, --colorize=COLORIZE
+                        Provide list of colors to be used, as hex byte indexes
+                        to a rainbow palette, FF=white, 00=black
+</code></pre>
+
+<p>As seen in the example. Instead of specifying how many colors you want to use, you can tell which ones you want by providing a hex string where each byte encodes the color index, using the same internal saturated rainbow palette, where 00 is black and FF is white.</p>
 
 <h3>
 <a name="--blocksize" class="anchor" href="#--blocksize"><span class="octicon octicon-link"></span></a>--blocksize</h3>
