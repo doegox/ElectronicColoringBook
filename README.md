@@ -3,7 +3,7 @@ ElectronicColoringBook
 
 Colorize data file according to repetitive chunks, typical in ECB encrypted.
 
-See usage and examples on the project page:
+See usage details and examples on the project page:
 
 https://doegox.github.io/ElectronicColoringBook/
 
