@@ -21,16 +21,16 @@ Options:
   -h, --help            show this help message and exit
   -c COLORS, --colors=COLORS
                         Number of colors to use, default=16
-  -C COLORIZE, --colorize=COLORIZE
+  -P PALETTE, --palette=PALETTE
                         Provide list of colors to be used, as hex byte indexes
-                        to a rainbow palette, FF=white, 00=black
+                        to a rainbow palette or as RGB palette
   -b BLOCKSIZE, --blocksize=BLOCKSIZE
                         Blocksize to consider, in bytes, default=16
   -g GROUPS, --groups=GROUPS
                         Groups of N blocks e.g. when blocksize is not multiple
                         of underlying data, default=1
   -r RATIO, --ratio=RATIO
-                        Ratio of output image
+                        Ratio of output image, e.g. -r 4:3
   -x WIDTH, --width=WIDTH
                         Width of output image
   -y HEIGHT, --height=HEIGHT
