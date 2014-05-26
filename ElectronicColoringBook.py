@@ -16,6 +16,7 @@ from optparse import OptionParser
 
 options = OptionParser(usage='%prog [options] file', description='Colorize data file according to repetitive chunks, typical in ECB encrypted data')
 options.add_option('-c', '--colors', type='int', default=16, help='Number of colors to use, default=16')
+options.add_option('-C', '--colorize', help='Provide list of colors to be used, as hex byte indexes to a rainbow palette, FF=white, 00=black')
 options.add_option('-b', '--blocksize', type='int', default=16, help='Blocksize to consider, in bytes, default=16')
 options.add_option('-g', '--groups', type=int, default=1, help='Groups of N blocks e.g. when blocksize is not multiple of underlying data, default=1')
 options.add_option('-r', '--ratio', help='Ratio of output image, e.g. -r 4:3')
@@ -46,6 +47,14 @@ if len(args) < 1:
     options.print_help()
     sys.exit()
 
+if opts.colors != 16 and opts.colorize:
+    # Testing against default values to guess if user mixed options...
+    print "Please don't mix -c with -C!"
+    sys.exit()
+
+if opts.colorize:
+    opts.colors = len(opts.colorize)/2
+
 if opts.colors < 2:
     print "Please choose at least two colors"
     sys.exit()
@@ -58,9 +67,9 @@ if opts.ratio is not None and (opts.width is not None or opts.height is not None
     print "Please don't mix -r with -x or -y!"
     sys.exit()
 
-if opts.raw is True and (opts.colors != 16 or opts.blocksize != 16 or opts.groups != 1 or opts.pixelwidth != 1):
+if opts.raw is True and (opts.colors != 16 or opts.blocksize != 16 or opts.groups != 1 or opts.pixelwidth != 1 or opts.colorize):
     # Testing against default values to guess if user mixed options...
-    print "Please don't mix -R with -b, -c, -g or -p!"
+    print "Please don't mix -R with -b, -c, -C, -g or -p!"
     sys.exit()
 
 if opts.output:
@@ -110,16 +119,25 @@ else:
     colormap={}
     for i in range(len(histo)/opts.groups):
         if i == 0:
-            color=255 # white
+            if opts.colorize:
+                color=int(opts.colorize[:2], 16)
+            else:
+                color=255 # white
         else:
-            color=random.randint(1,254)
+            if opts.colorize:
+                color=int(opts.colorize[i*2:i*2+2], 16)
+            else:
+                color=random.randint(1,254)
         for g in range(opts.groups):
             gi =(i*opts.groups)+g
             colormap[histo[gi][0]]=chr(color)
             print "%s %10s #%02X -> #%02X #%02X #%02X" % (histo[gi][0], histo[gi][1], color, p[color*3], p[(color*3)+1], p[(color*3)+2])
     blocksleft=len(ciphertext)/opts.blocksize-reduce(lambda x, y: x+y, [n for (t, n) in histo])
     # All other blocks will be painted in black:
-    color=0
+    if opts.colorize:
+        color=int(opts.colorize[-2:], 16)
+    else:
+        color=0
     print "%s %10i #%02X -> #%02X #%02X #%02X" % ("*" * len(histo[0][0]), blocksleft, color, p[color*3], p[(color*3)+1], p[(color*3)+2])
 
     # Construct output stream
