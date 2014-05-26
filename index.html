@@ -68,7 +68,7 @@ A striking example of the degree to which ECB can leave plaintext data patterns 
 
 <hr><p>Here is another example we'll walk through. For the record the binary blob was created from some ppm (as we need a non-compressed bitmap to start with) as:</p>
 
-<p><code>openssl enc -e -aes-128-ecb -in test.ppm -out test.bin -k toto</code></p>
+<p><code>openssl enc -e -aes-128-ecb -in test.ppm -out test.bin -k toto -nosalt</code></p>
 
 <p>test.bin is available <a href="./images/test.bin">here</a></p>
 
@@ -160,8 +160,8 @@ b52adc1063add22fe924ef3b1f6455f7        109 #FE -&gt; #CC #28 #2C
 
 <p><img src="./images/test.bin.4.png" alt="test.bin.4"></p>
 
-<p>Still one more thing: Pluto's tail is wrapped, that's because before the real data there is the image header (here a PPM header) and in this case a salt because of the way we used openssl.
-So we can apply a small offset to skip them. As we're working with blocks it can't be perfect. Here best is to skip two blocks, so 32 bytes:</p>
+<p>Still one more thing: Pluto's tail is wrapped, that's because before the real data there is the image header (here a PPM header) and in some case a salt if e.g. using openssl with a password.
+So we can apply a small offset to skip them. As we're working with blocks it can't be perfect. Here best is to skip one block, so 16 bytes:</p>
 
 <p><code>ElectronicColoringBook.py test.bin -p 3 -g 3 --offset=1</code></p>
 
