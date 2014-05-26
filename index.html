@@ -156,7 +156,7 @@ b52adc1063add22fe924ef3b1f6455f7        109 #FE -&gt; #CC #28 #2C
 
 <p>So let's do it:</p>
 
-<p><code>ElectronicColoringBook.py test.bin -p 3 --group=3</code></p>
+<p><code>ElectronicColoringBook.py test.bin -p 3 --groups=3</code></p>
 
 <p><img src="./images/test.bin.4.png" alt="test.bin.4"></p>
 
@@ -265,7 +265,7 @@ So we can apply a small offset to skip them. As we're working with blocks it can
                         but more precise, default=1000
 </code></pre>
 
-<p>Sampling is used for the auto-correlation used while guessing the ratio. I never had to lower it but if you have difficulties recovering the ratio you may try lower sampling values.</p>
+<p>Sampling is used for the auto-correlation used while guessing the ratio. I never had to lower it but if you have difficulties recovering the ratio you may try lower sampling values. On the contrary, for large images, you may increase it for faster guess of the ratio.</p>
 
 <h3>
 <a name="--maxratio" class="anchor" href="#--maxratio"><span class="octicon octicon-link"></span></a>--maxratio</h3>
