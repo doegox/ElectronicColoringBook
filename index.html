@@ -502,7 +502,37 @@ Size:  (240, 401)
 <p>And to make it clear, it won't work on jpeg, png or other compressed or vectorized formats either.</p>
 
 <h3>
-<a name="so-maybe-you-could-show-us-the-original-ecb-mascot" class="anchor" href="#so-maybe-you-could-show-us-the-original-ecb-mascot"><span class="octicon octicon-link"></span></a>So maybe you could show us the original ECB mascot?</h3>
+<a name="oh-come-on-pleeeeeze" class="anchor" href="#oh-come-on-pleeeeeze"><span class="octicon octicon-link"></span></a>Oh come on, pleeeeeze!</h3>
+
+<p>Ok ok, here is an encrypted BMP (ARGB) of a vectorized version reduced to 20 colors: <a href="./images/test7.bin">test7.bin</a>.</p>
+
+<p>It will be the occasion to show how to choose colors...</p>
+
+<p>So BMP =&gt; -f; ARGB =&gt; -p 4; 20 colors =&gt; -c 21 (we want black for the "noise")</p>
+
+<p><code>ElectronicColoringBook.py test7.bin -p 4 -f -o 4 -c 21 -r 1:1</code></p>
+
+<p><img src="./images/test7.bin.1.png" alt="test7.bin.1"></p>
+
+<p>We know the white spot is the largest so we can paint it.
+Now let's identify the next area:</p>
+
+<p><code>ElectronicColoringBook.py test7.bin -p 4 -f -o 4 -r 1:1 -P '#d35e5d#ffffff#000000'</code></p>
+
+<p><img src="./images/test7.bin.2.png" alt="test7.bin.2"></p>
+
+<p><code>ElectronicColoringBook.py test7.bin -p 4 -f -o 4 -r 1:1 -P '#d35e5d#c97e76#ffffff#000000'</code></p>
+
+<p><img src="./images/test7.bin.3.png" alt="test7.bin.3"></p>
+
+<p>etc, till:</p>
+
+<p><code>ElectronicColoringBook.py test7.bin -p 4 -f -o 4 -r 1:1 -P '#d35e5d#c97e76#5f1945#ac414d#e07e68#671a3e#cf6c70#e5bcac#ea9173#d7a79f#be5258#f0c28f#69285a#802e4a#943147#d8988f#de8a7d#915884#994b58#b38f94#333333'</code></p>
+
+<p><img src="./images/test7.bin.4.png" alt="test7.bin.4"></p>
+
+<h3>
+<a name="what-about-the-original-ecb-mascot" class="anchor" href="#what-about-the-original-ecb-mascot"><span class="octicon octicon-link"></span></a>What about the original ECB mascot?</h3>
 
 <p>The problem is that I can't find the original encrypted version of Tux used to generate the ECB-encrypted mascot you can find everywhere else, neither the original non-encrypted version.</p>
 
