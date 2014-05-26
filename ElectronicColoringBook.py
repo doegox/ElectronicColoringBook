@@ -16,7 +16,7 @@ from optparse import OptionParser
 
 options = OptionParser(usage='%prog [options] file', description='Colorize data file according to repetitive chunks, typical in ECB encrypted data')
 options.add_option('-c', '--colors', type='int', default=16, help='Number of colors to use, default=16')
-options.add_option('-C', '--colorize', help='Provide list of colors to be used, as hex byte indexes to a rainbow palette, FF=white, 00=black')
+options.add_option('-P', '--palette', help='Provide list of colors to be used, as hex byte indexes to a rainbow palette or as RGB palette')
 options.add_option('-b', '--blocksize', type='int', default=16, help='Blocksize to consider, in bytes, default=16')
 options.add_option('-g', '--groups', type=int, default=1, help='Groups of N blocks e.g. when blocksize is not multiple of underlying data, default=1')
 options.add_option('-r', '--ratio', help='Ratio of output image, e.g. -r 4:3')
@@ -47,13 +47,21 @@ if len(args) < 1:
     options.print_help()
     sys.exit()
 
-if opts.colors != 16 and opts.colorize:
+if opts.colors != 16 and opts.palette:
     # Testing against default values to guess if user mixed options...
     print "Please don't mix -c with -C!"
     sys.exit()
 
-if opts.colorize:
-    opts.colors = len(opts.colorize)/2
+palette=None
+if opts.palette:
+    if '#' in opts.palette:
+        opts.colors = len(opts.palette)/7
+        palette=[]
+        for rgb in opts.palette.split('#')[1:]:
+            palette.extend([int(rgb[:2], 16),int(rgb[2:4], 16),int(rgb[4:], 16)])
+        opts.palette = ''.join(["%02X" % i for i in range(opts.colors)])
+    else:
+        opts.colors = len(opts.palette)/2
 
 if opts.colors < 2:
     print "Please choose at least two colors"
@@ -67,7 +75,7 @@ if opts.ratio is not None and (opts.width is not None or opts.height is not None
     print "Please don't mix -r with -x or -y!"
     sys.exit()
 
-if opts.raw is True and (opts.colors != 16 or opts.blocksize != 16 or opts.groups != 1 or opts.pixelwidth != 1 or opts.colorize):
+if opts.raw is True and (opts.colors != 16 or opts.blocksize != 16 or opts.groups != 1 or opts.pixelwidth != 1 or opts.palette):
     # Testing against default values to guess if user mixed options...
     print "Please don't mix -R with -b, -c, -C, -g or -p!"
     sys.exit()
@@ -105,11 +113,14 @@ else:
     N = 254
     HSV_tuples = [(x*1.0/N, 0.8, 0.8) for x in range(N)]
     RGB_tuples = map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples)
-    p=[0,0,0]               # black
-    for rgb in RGB_tuples:
-        p.extend(rgb)         # rainbow
-    p.extend([1, 1, 1])     # white
-    p=[int(pp*255) for pp in p]
+    if palette:
+        p=palette
+    else:
+        p=[1,1,1]               # white
+        for rgb in RGB_tuples:
+            p.extend(rgb)         # rainbow
+        p.extend([0, 0, 0])     # black
+        p=[int(pp*255) for pp in p]
     # Show palette:
     #j=Image.fromstring('P', (256, 256), ''.join([chr(a) for a in range(256)]*256))
     #j.putpalette(p)
@@ -119,13 +130,13 @@ else:
     colormap={}
     for i in range(len(histo)/opts.groups):
         if i == 0:
-            if opts.colorize:
-                color=int(opts.colorize[:2], 16)
+            if opts.palette:
+                color=int(opts.palette[:2], 16)
             else:
-                color=255 # white
+                color=0 # white
         else:
-            if opts.colorize:
-                color=int(opts.colorize[i*2:i*2+2], 16)
+            if opts.palette:
+                color=int(opts.palette[i*2:i*2+2], 16)
             else:
                 color=random.randint(1,254)
         for g in range(opts.groups):
@@ -134,10 +145,10 @@ else:
             print "%s %10s #%02X -> #%02X #%02X #%02X" % (histo[gi][0], histo[gi][1], color, p[color*3], p[(color*3)+1], p[(color*3)+2])
     blocksleft=len(ciphertext)/opts.blocksize-reduce(lambda x, y: x+y, [n for (t, n) in histo])
     # All other blocks will be painted in black:
-    if opts.colorize:
-        color=int(opts.colorize[-2:], 16)
+    if opts.palette:
+        color=int(opts.palette[-2:], 16)
     else:
-        color=0
+        color=255
     print "%s %10i #%02X -> #%02X #%02X #%02X" % ("*" * len(histo[0][0]), blocksleft, color, p[color*3], p[(color*3)+1], p[(color*3)+2])
 
     # Construct output stream
