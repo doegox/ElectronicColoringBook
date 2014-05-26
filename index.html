@@ -424,21 +424,20 @@ Size:  (384, 286)
 <h3>
 <a name="filippo--the-ecb-penguin" class="anchor" href="#filippo--the-ecb-penguin"><span class="octicon octicon-link"></span></a>Filippo &amp; The ECB Penguin</h3>
 
-<p>Filippo (probably better known for his <a href="https://filippo.io/Heartbleed/">Heartbleed test</a> wrote a post about <a href="https://filippo.io/the-ecb-penguin/">the ECB Penguin</a> with the goal to make better-looking versions.</p>
+<p>Filippo (probably better known for his <a href="https://filippo.io/Heartbleed/">Heartbleed test</a>) wrote a post about <a href="https://filippo.io/the-ecb-penguin/">the ECB Penguin</a> with the goal to make better-looking versions.</p>
 
-<p>The trick was to work from a very large image (2507 x 2955) so the relative loss of precision due to the blocksize decreases significantly.</p>
+<p>The trick was to work from a very large image (about 2500 x 3000) so the relative loss of precision due to the blocksize decreases significantly and if you look to the picture scaled down, the local noise tends to be smoothed away.</p>
 
-<p>Let's see what our tool would do. Starting from his original ECB tux: </p>
+<p>But if look at the image closer you'll see the usual random colors due to ECB and on the scaled down version, colors tend to be averaged to some grayish faded colors.</p>
 
-<p><img src="./images/test5.bin.png" alt="test5.bin"></p>
+<h3>
+<a name="gyncryption" class="anchor" href="#gyncryption"><span class="octicon octicon-link"></span></a>GynCryption</h3>
 
-<p>Convert it back to PPM.</p>
+<p><a href="https://corkami.googlecode.com/svn/trunk/src/angecryption/GynCryption/">GynCryption</a> is a variant of AngeCryption suggested by Gynvael Coldwind, using ECB and brute-forcing a key such that the encrypted file header becomes a valid header pointing to another part of the file.</p>
 
-<p><code>ElectronicColoringBook.py -x 2507 -p 3</code></p>
+<p>So there the resulting image is radically different.</p>
 
-<p>Several times and make a mosaic out of it:</p>
-
-<p><img src="./images/test5.bin.2.png" alt="test5.bin.2"></p>
+<p>Quite funny trick! Check <a href="https://code.google.com/p/corkami/">Ange's presentations</a> if you don't' know Angecryption yet.</p>
 
 <hr><h2>
 <a name="about-the-author" class="anchor" href="#about-the-author"><span class="octicon octicon-link"></span></a>About the author</h2>
