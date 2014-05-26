@@ -396,15 +396,6 @@ Size:  (384, 286)
 <p><img src="./images/test4.bin.1.png" alt="test4.bin.1"></p>
 
 <hr><h2>
-<a name="about-the-author" class="anchor" href="#about-the-author"><span class="octicon octicon-link"></span></a>About the author</h2>
-
-<p>This tool has been written by <a href="http://wiki.yobi.be/wiki/User:PhilippeTeuwen">Philippe Teuwen</a>.</p>
-
-<p>Don't hesitate to contact me for any suggestion, remark or alternative usages.</p>
-
-<p>You can also use the <a href="https://github.com/doegox/ElectronicColoringBook/issues">issue tracker</a> or just <a href="https://github.com/doegox/ElectronicColoringBook/fork">fork</a> and propose pull requests on Github.</p>
-
-<hr><h2>
 <a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h2>
 
 <h3>
@@ -415,6 +406,48 @@ Size:  (384, 286)
 <p>More seriously, ElectronicColoringBook works only on large areas of (strictly) uniform color, which is rarely the case in photography (no, that pink wasn't uniform enough).</p>
 
 <p>And to make it clear, it won't work on jpeg, png or other compressed or vectorized formats either.</p>
+
+<h3>
+<a name="so-maybe-you-could-show-us-the-original-ecb-mascot" class="anchor" href="#so-maybe-you-could-show-us-the-original-ecb-mascot"><span class="octicon octicon-link"></span></a>So maybe you could show us the original ECB mascot?</h3>
+
+<p>The problem is that I can't find the original encrypted version of Tux used to generate the ECB-encrypted mascot you can find everywhere else, neither the original non-encrypted version.</p>
+
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Tux_ecb.jpg" alt="ecb tux"></p>
+
+<p>is a jpeg, scaled down version so it's impossible to work from that one.</p>
+
+<p>Sorry. See also below, the efforts of Filippo to contact the original author.</p>
+
+<hr><h2>
+<a name="related-artwork" class="anchor" href="#related-artwork"><span class="octicon octicon-link"></span></a>Related (art)work</h2>
+
+<h3>
+<a name="filippo--the-ecb-penguin" class="anchor" href="#filippo--the-ecb-penguin"><span class="octicon octicon-link"></span></a>Filippo &amp; The ECB Penguin</h3>
+
+<p>Filippo (probably better known for his <a href="https://filippo.io/Heartbleed/">Heartbleed test</a> wrote a post about <a href="https://filippo.io/the-ecb-penguin/">the ECB Penguin</a> with the goal to make better-looking versions.</p>
+
+<p>The trick was to work from a very large image (2507 x 2955) so the relative loss of precision due to the blocksize decreases significantly.</p>
+
+<p>Let's see what our tool would do. Starting from his original ECB tux: </p>
+
+<p><img src="./images/test5.bin.png" alt="test5.bin"></p>
+
+<p>Convert it back to PPM.</p>
+
+<p><code>ElectronicColoringBook.py -x 2507 -p 3</code></p>
+
+<p>Several times and make a mosaic out of it:</p>
+
+<p><img src="./images/test5.bin.2.png" alt="test5.bin.2"></p>
+
+<hr><h2>
+<a name="about-the-author" class="anchor" href="#about-the-author"><span class="octicon octicon-link"></span></a>About the author</h2>
+
+<p>This tool has been written by <a href="http://wiki.yobi.be/wiki/User:PhilippeTeuwen">Philippe Teuwen</a>.</p>
+
+<p>Don't hesitate to contact me for any suggestion, remark or alternative usages.</p>
+
+<p>You can also use the <a href="https://github.com/doegox/ElectronicColoringBook/issues">issue tracker</a> or just <a href="https://github.com/doegox/ElectronicColoringBook/fork">fork</a> and propose pull requests on Github.</p>
       </section>
     </div>
 
