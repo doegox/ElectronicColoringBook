@@ -28,8 +28,8 @@
 
     <div class="container">
       <section id="main_content">
-        <h3>
-<a name="welcome-to-the-electronic-coloring-book-project-page" class="anchor" href="#welcome-to-the-electronic-coloring-book-project-page"><span class="octicon octicon-link"></span></a>Welcome to the Electronic Coloring Book project page.</h3>
+        <h2>
+<a name="welcome-to-the-electronic-coloring-book-project-page" class="anchor" href="#welcome-to-the-electronic-coloring-book-project-page"><span class="octicon octicon-link"></span></a>Welcome to the Electronic Coloring Book project page.</h2>
 
 <p>The name is obviously a wordplay with <a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29">Electronic Codebook</a>, the simplest but also the most insecure chaining mode of operations to be used with a block cipher.</p>
 
@@ -46,13 +46,13 @@ A striking example of the degree to which ECB can leave plaintext data patterns 
 
 <p>Yes we can see it despite it's encrypted, but it's neither that obvious nor visually satisfying, for several reasons we'll explain. We can do better! And that's the goal of this little project.</p>
 
-<h3>
-<a name="why-ecb-forensics-isnt-that-easy" class="anchor" href="#why-ecb-forensics-isnt-that-easy"><span class="octicon octicon-link"></span></a>Why ECB forensics isn't that easy?</h3>
+<hr><h2>
+<a name="why-ecb-forensics-isnt-that-easy" class="anchor" href="#why-ecb-forensics-isnt-that-easy"><span class="octicon octicon-link"></span></a>Why ECB forensics isn't that easy?</h2>
 
 <p>Those ECB exemplary images are made artificially: the author knows the original file format (width, height, pixel encoding) and typically overwrites the encrypted header with the original one.</p>
 
 <p>But when a file is encrypted and you don't know anything about it, it's not that simple.
-<br>One example is the 300 points challenge of the <em>2014 Nuit du Hack CTF Quals</em> called <em>The Another One</em>. All you get is an encrypted BMP (as you can guess from the file extension). More details on the resolution of that challenge are available <a href="http://wiki.yobi.be/wiki/NDH_Writeups#Another_One">here</a>.</p>
+<br>One example is the 300 points challenge of the <em>2014 Nuit du Hack CTF Quals</em> called <em>The Another One</em>. All you get is an encrypted BMP (as you can guess from the file extension). </p>
 
 <p>It appears quickly that there are recurring encrypted blocks but practical problems are to recover the unknown parameters:</p>
 
@@ -64,7 +64,9 @@ A striking example of the degree to which ECB can leave plaintext data patterns 
 
 <p><em>header + width * height * bytes_per_pixel + padding = filesize</em></p>
 
-<p>Here is another example we'll walk through. For the record the binary blob was created from some ppm (as we need a non-compressed bitmap to start with) as:</p>
+<p>I <a href="http://wiki.yobi.be/wiki/NDH_Writeups#Another_One">solved manually</a> that challenge during the CTF but it's the trigger that pushed me to write this tool, to automate that painful process, and get nicer results!</p>
+
+<hr><p>Here is another example we'll walk through. For the record the binary blob was created from some ppm (as we need a non-compressed bitmap to start with) as:</p>
 
 <p><code>openssl enc -e -aes-128-ecb -in test.ppm -out test.bin -k toto</code></p>
 
@@ -82,21 +84,28 @@ A striking example of the degree to which ECB can leave plaintext data patterns 
 
 <p>But we'll see our tool can do much better!</p>
 
-<h3>
-<a name="electroniccoloringbookpy-a-real-example" class="anchor" href="#electroniccoloringbookpy-a-real-example"><span class="octicon octicon-link"></span></a>ElectronicColoringBook.py: a real example</h3>
+<hr><h2>
+<a name="electroniccoloringbookpy-a-real-example" class="anchor" href="#electroniccoloringbookpy-a-real-example"><span class="octicon octicon-link"></span></a>ElectronicColoringBook.py: a real example</h2>
 
-<p>ElectronicColoringBook.py is a Python (doh!) script implementing a number of options we'll discover throught the analysis of the <a href="./images/test.bin">test.bin</a> file we generated.</p>
+<p>ElectronicColoringBook.py is a Python (doh!) script implementing a number of options we'll discover throught the analysis of the <a href="./images/test.bin">test.bin</a> file we generated above.</p>
 
-<p>Its goal is to paint over recurring ECB blocks to reveal more easily, and more nicely, the structure of an ECB-encrypted file. It does so by first computing an histogram of recurring blocks, then map it to a color map. It also tries to guess the right ratio with some fast stupid auto-correlation.</p>
+<p>The main idea is to paint over recurring ECB blocks to reveal more easily, and more nicely, the structure of an ECB-encrypted file. </p>
 
-<p>By default, it assumes:</p>
+<p>It does so by first computing an histogram of recurring blocks, then paint the most recurring blocks according to a color map. It also tries to guess the right ratio with some stupid hand-made kind of auto-correlation.</p>
+
+<p>The color map is the following:</p>
+
+<ul>
+<li>The most recurring block is painted in white</li>
+<li>Then the next top ones are painted with some random <a href="https://en.wikipedia.org/wiki/Colorfulness">saturated</a> color, to make them easy to see</li>
+<li>All remaining blocks will be <a href="https://www.youtube.com/watch?v=u6d8eKvegLI">painted in black</a>, because it's nicer than noise!</li>
+</ul><p>By default, the tool assumes:</p>
 
 <ul>
 <li>a blocksize of 16 bytes, which is the blocksize of AES</li>
 <li>an unknown ratio, to be guessed</li>
 <li>one byte per pixel</li>
-<li>16 colors will be used: the most widespread block in white, the next 14 randomly, and all remaining blocks will be <a href="https://www.youtube.com/watch?v=u6d8eKvegLI">painted in black</a>
-</li>
+<li>16 colors will be used: the most widespread block in white, the next 14 randomly, and the others in black.</li>
 </ul><p>Let's see:</p>
 
 <p><code>ElectronicColoringBook.py test.bin</code></p>
@@ -162,16 +171,22 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 
 <p>Now you understand better the name of our tool, Electronic Coloring Book :-)</p>
 
-<h3>
-<a name="electroniccoloringbookpy-the-options" class="anchor" href="#electroniccoloringbookpy-the-options"><span class="octicon octicon-link"></span></a>ElectronicColoringBook.py: the options</h3>
+<hr><h2>
+<a name="electroniccoloringbookpy-the-options" class="anchor" href="#electroniccoloringbookpy-the-options"><span class="octicon octicon-link"></span></a>ElectronicColoringBook.py: the options</h2>
 
 <p>We've seen a few options in the example above but there are more of them:</p>
+
+<h3>
+<a name="--colors" class="anchor" href="#--colors"><span class="octicon octicon-link"></span></a>--colors</h3>
 
 <pre><code>  -c COLORS, --colors=COLORS
                         Number of colors to use, default=16
 </code></pre>
 
 <p>Maximum number of colors to use is 256. Minimum is 2. Tune it for the best effect.</p>
+
+<h3>
+<a name="--blocksize" class="anchor" href="#--blocksize"><span class="octicon octicon-link"></span></a>--blocksize</h3>
 
 <pre><code>  -b BLOCKSIZE, --blocksize=BLOCKSIZE
                         Blocksize to consider, in bytes, default=16
@@ -187,6 +202,9 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 
 <p><img src="./images/test.bin.7.png" alt="test.bin.7"></p>
 
+<h3>
+<a name="--groups" class="anchor" href="#--groups"><span class="octicon octicon-link"></span></a>--groups</h3>
+
 <pre><code>  -g GROUPS, --groups=GROUPS
                         Groups of N blocks e.g. when blocksize is not multiple
                         of underlying data, default=1
@@ -194,17 +212,26 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 
 <p>As seen in the example</p>
 
+<h3>
+<a name="--ratio" class="anchor" href="#--ratio"><span class="octicon octicon-link"></span></a>--ratio</h3>
+
 <pre><code>  -r RATIO, --ratio=RATIO
                         Ratio of output image
 </code></pre>
 
 <p>If you know it or want to tune it, feel free. Example: <code>-r 4:3</code></p>
 
+<h3>
+<a name="--width" class="anchor" href="#--width"><span class="octicon octicon-link"></span></a>--width</h3>
+
 <pre><code>  -x WIDTH, --width=WIDTH
                         Width of output image
 </code></pre>
 
 <p>If you know it or want to tune it, feel free.</p>
+
+<h3>
+<a name="--height" class="anchor" href="#--height"><span class="octicon octicon-link"></span></a>--height</h3>
 
 <pre><code>  -y HEIGHT, --height=HEIGHT
                         Height of output image
@@ -214,12 +241,18 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 
 <p>Ratio, width and height are mutually exclusive as one is enough to force the final ratio given the file size.</p>
 
+<h3>
+<a name="--sampling" class="anchor" href="#--sampling"><span class="octicon octicon-link"></span></a>--sampling</h3>
+
 <pre><code>  -s SAMPLING, --sampling=SAMPLING
                         Sampling when guessing image size. Smaller is slower
                         but more precise, default=1000
 </code></pre>
 
 <p>Sampling is used for the auto-correlation used while guessing the ratio. I never had to lower it but if you have difficulties recovering the ratio you may try lower sampling values.</p>
+
+<h3>
+<a name="--maxratio" class="anchor" href="#--maxratio"><span class="octicon octicon-link"></span></a>--maxratio</h3>
 
 <pre><code>  -m MAXRATIO, --maxratio=MAXRATIO
                         Max ratio to test when guessing image size. E.g.
@@ -229,16 +262,25 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 <p>If you expect weird ratio you can play with maxratio...
 But remember adjusting pixelwidth will bring you closer to correct ratio too.</p>
 
+<h3>
+<a name="--offset" class="anchor" href="#--offset"><span class="octicon octicon-link"></span></a>--offset</h3>
+
 <pre><code>  -o OFFSET, --offset=OFFSET
                         Offset to skip original header, in number of blocks
 </code></pre>
 
 <p>As seen in the example</p>
 
+<h3>
+<a name="--flip" class="anchor" href="#--flip"><span class="octicon octicon-link"></span></a>--flip</h3>
+
 <pre><code>  -f, --flip            Flip image top&lt;&gt;bottom
 </code></pre>
 
 <p>If you reveal a BMP, you'll have to flip it.</p>
+
+<h3>
+<a name="--pixelwidth" class="anchor" href="#--pixelwidth"><span class="octicon octicon-link"></span></a>--pixelwidth</h3>
 
 <pre><code>  -p PIXELWIDTH, --pixelwidth=PIXELWIDTH
                         How many bytes per pixel in the original image
@@ -246,15 +288,41 @@ But remember adjusting pixelwidth will bring you closer to correct ratio too.</p
 
 <p>As seen in the example</p>
 
+<h3>
+<a name="--raw" class="anchor" href="#--raw"><span class="octicon octicon-link"></span></a>--raw</h3>
+
 <pre><code>  -R, --raw             Display raw image in 256 colors
 </code></pre>
 
-<p>No histogram here, no block, each byte is one pixel, using a smooth rainbow palette.</p>
+<p>No histogram here, no block, each byte is one pixel, using a smooth saturated rainbow palette.</p>
 
-<p>This is what we used to display test.bin <em>raw</em> at first</p>
+<p>This is what we used to display test.bin <em>raw</em> at first, but if we let it guessing the ratio, it gives the kind of typical ECB-encrypted images you've seen before:</p>
 
-<h3>
-<a name="wrong-ratio" class="anchor" href="#wrong-ratio"><span class="octicon octicon-link"></span></a>Wrong ratio?</h3>
+<p><code>ElectronicColoringBook.py test.bin --raw</code></p>
+
+<p><img src="./images/test.bin.8.png" alt="test.bin.8"></p>
+
+<hr><h2>
+<a name="back-to-that-ctf-challenge" class="anchor" href="#back-to-that-ctf-challenge"><span class="octicon octicon-link"></span></a>Back to that CTF challenge</h2>
+
+<p>The original file was <a href="./images/crypted.bmp">crypted.bmp</a>.</p>
+
+<p>It's pretty large and a largely uniform background as 225062 of the 270000 ECB blocks are identical, so it's relatively easy to revert it even manually.</p>
+
+<p>E.g. if someone tries to display the raw content with a classical ratio of 4:3 he'll get something similar to (but with even less clear colors as he won't get them saturated):</p>
+
+<p><code>ElectronicColoringBook.py crypted.bmp --raw --ratio=4:3</code></p>
+
+<p><img src="./images/crypted.bmp.1.png" alt="crypted.bmp.1"></p>
+
+<p>And here is what you get with ElectronicColoringBook.py and the right options:</p>
+
+<p><code>ElectronicColoringBook.py crypted.bmp -c 3 -f -p 4</code></p>
+
+<p><img src="./images/crypted.bmp.2.png" alt="crypted.bmp.2"></p>
+
+<hr><h2>
+<a name="wrong-ratio" class="anchor" href="#wrong-ratio"><span class="octicon octicon-link"></span></a>Wrong ratio?</h2>
 
 <p>In rare cases, ratio is almost guessed but not entirely correct. This happens e.g. when width is not an entire multiple of blocksize.
 Here is a BMP encrypted: <a href="./images/test2.bin">test2.bin</a></p>
@@ -276,8 +344,8 @@ Let's tune them slightly:</p>
 
 <p>And indeed 1501 is not a multiple of 16.</p>
 
-<h3>
-<a name="not-only-ecb-xor" class="anchor" href="#not-only-ecb-xor"><span class="octicon octicon-link"></span></a>Not only ECB: XOR</h3>
+<hr><h2>
+<a name="not-only-ecb-xor" class="anchor" href="#not-only-ecb-xor"><span class="octicon octicon-link"></span></a>Not only ECB: XOR</h2>
 
 <p>Actually the tool can be useful in some other cases, e.g. for XORed files.
 Let's take our original example, this time XORed with a key of 5 chars instead of AES-encrypted: 
@@ -293,8 +361,8 @@ Let's take our original example, this time XORed with a key of 5 chars instead o
 
 <p><img src="./images/test3.bin.2.png" alt="test3.bin.2"></p>
 
-<h3>
-<a name="not-only-ecb-anything" class="anchor" href="#not-only-ecb-anything"><span class="octicon octicon-link"></span></a>Not only ECB: anything</h3>
+<hr><h2>
+<a name="not-only-ecb-anything" class="anchor" href="#not-only-ecb-anything"><span class="octicon octicon-link"></span></a>Not only ECB: anything</h2>
 
 <p>Actually we can use the tool to colorize whatever we want and reveal some structures.
 E.g. applied on /bin/ls on an amd64 arch, this gives:</p>
@@ -327,14 +395,26 @@ Size:  (384, 286)
 
 <p><img src="./images/test4.bin.1.png" alt="test4.bin.1"></p>
 
-<h3>
-<a name="about-author" class="anchor" href="#about-author"><span class="octicon octicon-link"></span></a>About author</h3>
+<hr><h2>
+<a name="about-the-author" class="anchor" href="#about-the-author"><span class="octicon octicon-link"></span></a>About the author</h2>
 
-<p>This tool has been written by <a href="http://wiki.yobi.be/wiki/User:PhilippeTeuwen">Philippe Teuwen</a></p>
+<p>This tool has been written by <a href="http://wiki.yobi.be/wiki/User:PhilippeTeuwen">Philippe Teuwen</a>.</p>
 
 <p>Don't hesitate to contact me for any suggestion, remark or alternative usages.</p>
 
 <p>You can also use the <a href="https://github.com/doegox/ElectronicColoringBook/issues">issue tracker</a> or just <a href="https://github.com/doegox/ElectronicColoringBook/fork">fork</a> and propose pull requests on Github.</p>
+
+<hr><h2>
+<a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h2>
+
+<h3>
+<a name="why-not-using-lena-image-as-everybody-else" class="anchor" href="#why-not-using-lena-image-as-everybody-else"><span class="octicon octicon-link"></span></a>Why not using Lena image as everybody else?</h3>
+
+<p>Yeah I would have preferred <a href="https://en.wikipedia.org/wiki/Lenna">Lena</a> too, but come on, it's coloring book, not Playboy!</p>
+
+<p>More seriously, ElectronicColoringBook works only on large areas of (strictly) uniform color, which is rarely the case in photography (no, that pink wasn't uniform enough).</p>
+
+<p>And to make it clear, it won't work on jpeg, png or other compressed or vectorized formats either.</p>
       </section>
     </div>
 
