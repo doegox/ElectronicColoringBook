@@ -445,6 +445,44 @@ Size:  (384, 286)
 
 <p><img src="./images/test4.bin.1.png" alt="test4.bin.1"></p>
 
+<p>While applied on /bin/ls on an ARM arch, we can use a blocksize of 4:</p>
+
+<pre><code>ElectronicColoringBook.py /bin/ls -b4 -m2
+00000000        681 #00 -&gt; #FF #FF #FF
+20202020        428 #A9 -&gt; #28 #2D #CC
+1eff2fe1        358 #8F -&gt; #28 #92 #CC
+000050e3        221 #D8 -&gt; #CC #28 #BF
+58ab0000        217 #59 -&gt; #28 #CC #35
+000053e3        201 #E4 -&gt; #CC #28 #90
+0400a0e1        120 #42 -&gt; #74 #CC #28
+2c990000        113 #D5 -&gt; #CC #28 #CA
+00c68fe2        112 #C7 -&gt; #97 #28 #CC
+12000000        112 #26 -&gt; #CC #B7 #28
+1dca8ce2        112 #8C -&gt; #28 #9D #CC
+f8c90000        100 #2E -&gt; #C1 #CC #28
+0000a0e3         98 #0B -&gt; #CC #4F #28
+0030a0e3         98 #82 -&gt; #28 #C4 #CC
+0700a0e1         81 #2C -&gt; #C9 #CC #28
+********      21037 #FF -&gt; #00 #00 #00
+Trying to guess ratio between 1:2 and 2:1 ...
+Width: from 155 to 620
+Sampling: 1000
+Progress: 200 300 400 500 600 
+Size:  (240, 401)
+</code></pre>
+
+<p>This gives a nice overview of the top most used ARM instructions as we can recognize in the histogram:</p>
+
+<pre><code>   e12fff1e     bx  lr
+   e3500000     cmp r0, #0
+   0000ab58     many pointers to loc_AB58 in big jump table?
+   e3530000     cmp r3, #0
+   e1a00004     mov r0, r4
+   etc
+</code></pre>
+
+<p><img src="./images/test5.bin.1.png" alt="test4.bin.1"></p>
+
 <hr><h2>
 <a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ</h2>
 
