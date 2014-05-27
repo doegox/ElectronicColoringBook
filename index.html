@@ -160,7 +160,7 @@ b52adc1063add22fe924ef3b1f6455f7        109 #FE -&gt; #CC #28 #2C
 
 <p><img src="./images/test.bin.4.png" alt="test.bin.4"></p>
 
-<p>Still one more thing: Pluto's tail is wrapped, that's because before the real data there is the image header (here a PPM header) and in some case a salt if e.g. using openssl with a password.
+<p>Still one more thing: Pluto's tail is wrapped, that's because before the real data there is the image header (here a PPM header).
 So we can apply a small offset to skip them. As we're working with blocks it can't be perfect. Here best is to skip one block, so 16 bytes:</p>
 
 <p><code>ElectronicColoringBook.py test.bin -p 3 -g 3 --offset=1</code></p>
@@ -285,7 +285,7 @@ But remember adjusting pixelwidth will bring you closer to correct ratio too.</p
                         Offset to skip original header, in number of blocks
 </code></pre>
 
-<p>As seen in the example</p>
+<p>We're displaying everything from the first block, but if the original image contained some header, we can skip the first blocks. Same if openssl was used with a salt: first block will contain "Salted_" and a salt so we can skip that block too. In the rare event when blocks are not starting from an aligned address (e.g. if someone forged a "ECB" image with a plaintext header), you can use a float as offset. E.g. -o 2.5 -b 16 =&gt; will skip 2.5*16=40 bytes.</p>
 
 <h3>
 <a name="--flip" class="anchor" href="#--flip"><span class="octicon octicon-link"></span></a>--flip</h3>
