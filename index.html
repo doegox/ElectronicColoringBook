@@ -314,7 +314,7 @@ But remember adjusting pixelwidth will bring you closer to correct ratio too.</p
 
 <p>If you combine it with <code>pixelwidth</code> it will skip some of the input bytes to preserve only one byte per pixel.</p>
 
-<p>This is what we used to display test.bin <em>raw</em> at first, but if we adjust <code>pixelwidth</code> and let it guessing the ratio, it gives the kind of typical ECB-encrypted images you've seen before:</p>
+<p>This is what we used to display test.bin <em>raw</em> at first, but if we adjust <code>pixelwidth</code> and let it guessing the ratio, it gives the kind of typical ECB-encrypted images you've seen before, but with saturated colors:</p>
 
 <p><code>ElectronicColoringBook.py test.bin --raw -p 3</code></p>
 
@@ -377,7 +377,7 @@ Here is a BMP encrypted: <a href="./images/test2.bin">test2.bin</a></p>
 
 <p><img src="./images/test2.bin.0.png" alt="test2.bin.0"></p>
 
-<p><code>ElectronicColoringBook.py test2.bin --raw -p 4 -f</code></p>
+<p><code>ElectronicColoringBook.py test2.bin --raw -p 4</code></p>
 
 <p><img src="./images/test2.bin.1.png" alt="test2.bin.1"></p>
 
@@ -407,9 +407,9 @@ Let's tune them slightly:</p>
 Let's take our original example, this time XORed with a key of 5 chars instead of AES-encrypted: 
 <a href="./images/test3.bin">test3.bin</a></p>
 
-<p><code>ElectronicColoringBook.py test3.bin --raw</code></p>
+<p><code>ElectronicColoringBook.py test3.bin --raw -p 3</code></p>
 
-<p><img src="./images/test3.bin.0.png" alt="test3.bin.0"></p>
+<p><img src="./images/test3.bin.1.png" alt="test3.bin.1"></p>
 
 <p>Blocksize=5 as XOR key is 5-byte long, pixelwidth is 3 bytes so we'll have to group them by 3 as 3 and 5 are co-primes, and finally a little offset to get rid of the header:</p>
 
