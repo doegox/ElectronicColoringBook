@@ -14,23 +14,29 @@ import colorsys
 import operator
 from optparse import OptionParser
 
-options = OptionParser(
-    usage='%prog [options] file', description='Colorize data file according to repetitive chunks, typical in ECB encrypted data')
+options = OptionParser(usage='%prog [options] file',
+                       description='Colorize data file according '
+                       'to repetitive chunks, typical in ECB encrypted data')
 options.add_option('-c', '--colors', type='int',
                    default=16, help='Number of colors to use, default=16')
 options.add_option('-P', '--palette',
-                   help='Provide list of colors to be used, as hex byte indexes to a rainbow palette or as RGB palette')
+                   help='Provide list of colors to be used, as hex byte '
+                   'indexes to a rainbow palette or as RGB palette')
 options.add_option('-b', '--blocksize', type='int',
-                   default=16, help='Blocksize to consider, in bytes, default=16')
+                   default=16, help='Blocksize to consider, in bytes, '
+                   'default=16')
 options.add_option('-g', '--groups', type=int, default=1,
-                   help='Groups of N blocks e.g. when blocksize is not multiple of underlying data, default=1')
+                   help='Groups of N blocks e.g. when blocksize is not '
+                   'multiple of underlying data, default=1')
 options.add_option('-r', '--ratio', help='Ratio of output image, e.g. -r 4:3')
 options.add_option('-x', '--width', type='int', help='Width of output image')
 options.add_option('-y', '--height', type='int', help='Height of output image')
 options.add_option('-s', '--sampling', type='int', default=1000,
-                   help='Sampling when guessing image size. Smaller is slower but more precise, default=1000')
+                   help='Sampling when guessing image size. Smaller is slower '
+                   'but more precise, default=1000')
 options.add_option('-m', '--maxratio', type='int', default=3,
-                   help='Max ratio to test when guessing image size. E.g. default=3 means testing ratios from 1:3 to 3:1')
+                   help='Max ratio to test when guessing image size. '
+                   'E.g. default=3 means testing ratios from 1:3 to 3:1')
 options.add_option('-o', '--offset', type='int', default=0,
                    help='Offset to skip original header, in number of blocks')
 options.add_option('-f', '--flip', action="store_true",
@@ -41,20 +47,20 @@ options.add_option('-R', '--raw', action="store_true",
                    default=False, help='Display raw image in 256 colors')
 options.add_option('-S', '--save', action="store_true",
                    default=False, help='Save a copy of the produced image')
-options.add_option(
-    '-O', '--output', help='Change default output location prefix, e.g. -O /tmp/mytest. Implies -S')
+options.add_option('-O', '--output', help='Change default output location '
+                   'prefix, e.g. -O /tmp/mytest. Implies -S')
 options.add_option('-D', '--dontshow', action="store_true",
                    default=False, help='Don\'t display image')
 
 
 def histogram(data, blocksize):
     d = {}
-    for i in range(len(data) / blocksize):
-        token = data[i * blocksize:(i + 1) * blocksize].encode('hex')
-        if token not in d:
-            d[token] = 1
+    for k in range(len(data) / blocksize):
+        block = data[k * blocksize:(k + 1) * blocksize].encode('hex')
+        if block not in d:
+            d[block] = 1
         else:
-            d[token] += 1
+            d[block] += 1
     return sorted(d.iteritems(), key=operator.itemgetter(1), reverse=True)
 
 opts, args = options.parse_args()
@@ -110,7 +116,7 @@ if opts.raw:
     # Create smooth palette
     N = 256
     HSV_tuples = [(x * 1.0 / N, 0.8, 0.8) for x in range(N)]
-    RGB_tuples = map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples)
+    RGB_tuples = [colorsys.hsv_to_rgb(*x) for x in HSV_tuples]
     p = []
     for rgb in RGB_tuples:
         p.extend(rgb)         # rainbow
@@ -122,7 +128,7 @@ else:
     # Cut histo to those we need to colorize
     histo = histo[:(opts.colors - 1) * opts.groups]
     # Cut histo to discard singletons
-    histo = filter(lambda x: x[1] > 1, histo)
+    histo = [x for x in histo if x[1] > 1]
     # Cut histo to keep exact multiple of group
     histo = histo[:len(histo) / opts.groups * opts.groups]
     if not histo:
@@ -131,7 +137,7 @@ else:
     # Construct palette with black & white at extremities
     N = 254
     HSV_tuples = [(x * 1.0 / N, 0.8, 0.8) for x in range(N)]
-    RGB_tuples = map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples)
+    RGB_tuples = [colorsys.hsv_to_rgb(*x) for x in HSV_tuples]
     if palette:
         p = palette
     else:
@@ -219,7 +225,7 @@ if opts.width is None and opts.height is None and opts.ratio is None:
 
 if opts.ratio is not None:
     # Compute ratio
-    ratio = tuple(map(int, opts.ratio.split(':')))
+    ratio = tuple([int(x) for x in opts.ratio.split(':')])
     l = len(out)
     x = math.sqrt(float(ratio[0]) / ratio[1] * l)
     y = x / ratio[0] * ratio[1]
