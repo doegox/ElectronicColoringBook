@@ -37,7 +37,7 @@ options.add_option('-s', '--sampling', type='int', default=1000,
 options.add_option('-m', '--maxratio', type='int', default=3,
                    help='Max ratio to test when guessing image size. '
                    'E.g. default=3 means testing ratios from 1:3 to 3:1')
-options.add_option('-o', '--offset', type='int', default=0,
+options.add_option('-o', '--offset', type='float', default=0,
                    help='Offset to skip original header, in number of blocks')
 options.add_option('-f', '--flip', action="store_true",
                    default=False, help='Flip image top<>bottom')
@@ -108,7 +108,7 @@ if opts.output:
     opts.save = True
 
 with open(args[0], 'rb') as f:
-    f.read(opts.offset * opts.blocksize)
+    f.read(int(round(opts.offset * opts.blocksize)))
     ciphertext = f.read()
 
 if opts.raw:
