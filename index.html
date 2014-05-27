@@ -173,7 +173,7 @@ So we can apply a small offset to skip them. As we're working with blocks it can
 
 <p><img src="./images/test.bin.9.png" alt="test.bin.9"></p>
 
-<p>And <em>voilà!</em></p>
+<p>And <em>voila!</em></p>
 
 <p>Now you understand better the name of our tool, Electronic Coloring Book :-)</p>
 
@@ -208,7 +208,7 @@ So we can apply a small offset to skip them. As we're working with blocks it can
                         Blocksize to consider, in bytes, default=16
 </code></pre>
 
-<p>AES blocksize is 16, DES blocksize is 8, but e.g. I've also used the tool against lists of SHA-1 (20 bytes). If you doubt about which blocksize to use, try small values then larger ones to merge repreating vertical stripes. But don't forget to play also with groups other wise you'll lose in resolution.</p>
+<p>AES blocksize is 16, DES blocksize is 8, but e.g. I've also used the tool against lists of SHA-1 (20 bytes). If you doubt about which blocksize to use, try small values then larger ones to merge repeating vertical stripes. But don't forget to play also with groups otherwise you'll lose in resolution.</p>
 
 <p><code>ElectronicColoringBook.py test.bin --blocksize=3 -p 3 -o 10</code></p>
 
@@ -405,7 +405,7 @@ Let's take our original example, this time XORed with a key of 5 chars instead o
 
 <p><img src="./images/test3.bin.1.png" alt="test3.bin.1"></p>
 
-<p>Blocksize=5 as XOR key is 5-byte long, pixelwidth is 3 bytes so we'll have to group them by 3 as 3 and 5 are coprimes, and finally a little offset to get rid of the header:</p>
+<p>Blocksize=5 as XOR key is 5-byte long, pixelwidth is 3 bytes so we'll have to group them by 3 as 3 and 5 are co-primes, and finally a little offset to get rid of the header:</p>
 
 <p><code>ElectronicColoringBook.py test3.bin -b 5 -g 3 -p 3 -o 3</code></p>
 
