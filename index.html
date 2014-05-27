@@ -312,9 +312,11 @@ But remember adjusting pixelwidth will bring you closer to correct ratio too.</p
 
 <p>No histogram here, no block, each byte is one pixel, using a smooth saturated rainbow palette.</p>
 
-<p>This is what we used to display test.bin <em>raw</em> at first, but if we let it guessing the ratio, it gives the kind of typical ECB-encrypted images you've seen before:</p>
+<p>If you combine it with <code>pixelwidth</code> it will skip some of the input bytes to preserve only one byte per pixel.</p>
 
-<p><code>ElectronicColoringBook.py test.bin --raw</code></p>
+<p>This is what we used to display test.bin <em>raw</em> at first, but if we adjust <code>pixelwidth</code> and let it guessing the ratio, it gives the kind of typical ECB-encrypted images you've seen before:</p>
+
+<p><code>ElectronicColoringBook.py test.bin --raw -p 3</code></p>
 
 <p><img src="./images/test.bin.8.png" alt="test.bin.8"></p>
 
@@ -373,6 +375,10 @@ Here is a BMP encrypted: <a href="./images/test2.bin">test2.bin</a></p>
 
 <p><code>ElectronicColoringBook.py test2.bin -m 4 --raw</code></p>
 
+<p><img src="./images/test2.bin.0.png" alt="test2.bin.0"></p>
+
+<p><code>ElectronicColoringBook.py test2.bin --raw -p 4 -f</code></p>
+
 <p><img src="./images/test2.bin.1.png" alt="test2.bin.1"></p>
 
 <p><code>ElectronicColoringBook.py test2.bin -p 4 -f</code></p>
@@ -403,7 +409,7 @@ Let's take our original example, this time XORed with a key of 5 chars instead o
 
 <p><code>ElectronicColoringBook.py test3.bin --raw</code></p>
 
-<p><img src="./images/test3.bin.1.png" alt="test3.bin.1"></p>
+<p><img src="./images/test3.bin.0.png" alt="test3.bin.0"></p>
 
 <p>Blocksize=5 as XOR key is 5-byte long, pixelwidth is 3 bytes so we'll have to group them by 3 as 3 and 5 are co-primes, and finally a little offset to get rid of the header:</p>
 
@@ -509,6 +515,10 @@ Size:  (240, 401)
 <p>It will be the occasion to show how to choose colors...</p>
 
 <p>So BMP =&gt; -f; ARGB =&gt; -p 4; 20 colors =&gt; -c 21 (we want black for the "noise")</p>
+
+<p><code>ElectronicColoringBook.py test7.bin -p 4 -f -o 4 --raw -r 1:1</code></p>
+
+<p><img src="./images/test7.bin.0.png" alt="test7.bin.0"></p>
 
 <p><code>ElectronicColoringBook.py test7.bin -p 4 -f -o 4 -c 21 -r 1:1</code></p>
 
