@@ -99,10 +99,9 @@ if opts.ratio is not None and (opts.width is not None or
     sys.exit()
 
 if opts.raw is True and (opts.colors != 16 or opts.blocksize != 16 or
-                         opts.groups != 1 or opts.pixelwidth != 1 or
-                         opts.palette):
+                         opts.groups != 1 or opts.palette):
     # Testing against default values to guess if user mixed options...
-    print "Please don't mix -R with -b, -c, -C, -g or -p!"
+    print "Please don't mix -R with -b, -c, -C or -g!"
     sys.exit()
 
 if opts.output:
@@ -121,8 +120,7 @@ if opts.raw:
     for rgb in RGB_tuples:
         p.extend(rgb)         # rainbow
     p = [int(pp * 255) for pp in p]
-    # Don't touch data
-    out = ciphertext
+    out = ciphertext[::opts.pixelwidth]
 else:
     histo = histogram(ciphertext, opts.blocksize)
     # Cut histo to those we need to colorize
@@ -249,7 +247,7 @@ if opts.save:
     if not opts.output:
         opts.output = args[0]
     if opts.raw:
-        suffix = ".raw"
+        suffix = ".raw_p%i" % opts.pixelwidth
     else:
         suffix = ".b%i_p%i_c%i" % (
             opts.blocksize, opts.pixelwidth, opts.colors)
