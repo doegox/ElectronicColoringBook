@@ -29,7 +29,8 @@ options.add_option('-g', '--groups', type=int, default=1,
                    help='Groups of N blocks e.g. when blocksize is not '
                    'multiple of underlying data, default=1')
 options.add_option('-r', '--ratio', help='Ratio of output image, e.g. -r 4:3')
-options.add_option('-x', '--width', type='int', help='Width of output image')
+options.add_option('-x', '--width', type='float', help='Width of output image, '
+                   'can be float e.g. to ignore line PNG-filter byte')
 options.add_option('-y', '--height', type='int', help='Height of output image')
 options.add_option('-s', '--sampling', type='int', default=1000,
                    help='Sampling when guessing image size. Smaller is slower '
@@ -38,7 +39,8 @@ options.add_option('-m', '--maxratio', type='int', default=3,
                    help='Max ratio to test when guessing image size. '
                    'E.g. default=3 means testing ratios from 1:3 to 3:1')
 options.add_option('-o', '--offset', type='float', default=0,
-                   help='Offset to skip original header, in number of blocks')
+                   help='Offset to skip original header in number of blocks, '
+                   'can be float')
 options.add_option('-f', '--flip', action="store_true",
                    default=False, help='Flip image top<>bottom')
 options.add_option('-p', '--pixelwidth', type='int', default=1,
@@ -230,7 +232,24 @@ if opts.ratio is not None:
     xy = (int(x), int(y))
 
 if opts.width is not None:
-    xy = (opts.width, len(out) / opts.width)
+    if int(opts.width) != opts.width:
+        # Fractional width, little trick...
+        out2=""
+        frac=opts.width-int(opts.width)
+        acc=0
+        miss=0
+        print "frac", frac
+        for i in range(len(out) / int(opts.width)):
+            line=out[i*int(opts.width):(i+1)*int(opts.width)]
+            acc+=frac
+            if acc > 1:
+                acc-=1
+                out2+=line[:-1]
+                miss+=1
+            else:
+                out2+=line
+        out=out2+("\xff"*miss)
+    xy = (int(opts.width), len(out) / int(opts.width))
 
 if opts.height is not None:
     xy = (len(out) / opts.height, opts.height)
@@ -254,8 +273,11 @@ if opts.save:
         if opts.groups != 1:
             suffix += "_g%i" % opts.groups
     if opts.offset != 0:
-        suffix += "_o%i" % opts.offset
-    suffix += "_x%i_y%i" % xy
+        suffix += "_o%s" % repr(opts.offset)
+    if opts.width is not None:
+        suffix += "_x%s_y%i" % (repr(opts.width), xy[1])
+    else:
+        suffix += "_x%i_y%i" % xy
     print "Saving output into " + opts.output + suffix + '.png'
     i.save(opts.output + suffix + '.png')
 if not opts.dontshow:

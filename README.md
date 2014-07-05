@@ -32,7 +32,8 @@ Options:
   -r RATIO, --ratio=RATIO
                         Ratio of output image, e.g. -r 4:3
   -x WIDTH, --width=WIDTH
-                        Width of output image
+                        Width of output image, can be float e.g. to ignore
+                        line PNG-filter byte
   -y HEIGHT, --height=HEIGHT
                         Height of output image
   -s SAMPLING, --sampling=SAMPLING
@@ -42,7 +43,8 @@ Options:
                         Max ratio to test when guessing image size. E.g.
                         default=3 means testing ratios from 1:3 to 3:1
   -o OFFSET, --offset=OFFSET
-                        Offset to skip original header, in number of blocks
+                        Offset to skip original header in number of blocks,
+                        can be float
   -f, --flip            Flip image top<>bottom
   -p PIXELWIDTH, --pixelwidth=PIXELWIDTH
                         How many bytes per pixel in the original image
@@ -52,4 +54,3 @@ Options:
                         Change default output location prefix, e.g. -O
                         /tmp/mytest. Implies -S
   -D, --dontshow        Don't display image
-```
