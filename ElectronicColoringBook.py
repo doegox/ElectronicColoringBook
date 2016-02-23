@@ -257,7 +257,7 @@ if opts.height is not None:
 print "Size: ", repr(xy)
 
 # Create image from output stream & ratio
-i = Image.fromstring('P', xy, out)
+i = Image.frombytes('P', xy, out)
 i.putpalette(p)
 
 if opts.flip:
