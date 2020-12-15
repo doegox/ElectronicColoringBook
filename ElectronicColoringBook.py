@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # See usage and examples on the project page:
 # https://doegox.github.io/ElectronicColoringBook/
@@ -153,7 +153,7 @@ else:
     # j.show()
 
     # Let's use random colors = random refs to the colormap...
-    colormap = {}
+    bcolormap = {}
     for i in range(len(histo) // opts.groups):
         if i == 0:
             if opts.palette:
@@ -167,7 +167,7 @@ else:
                 color = random.randint(1, 254)
         for g in range(opts.groups):
             gi = (i * opts.groups) + g
-            colormap[histo[gi][0]] = color
+            bcolormap[histo[gi][0]] = bytes([color])
             print("%s %10s #%02X" % (histo[gi][0], histo[gi][1], color), end=' ')
             print("-> #%02X #%02X #%02X" % (p[color * 3],
                                             p[(color * 3) + 1],
@@ -183,21 +183,25 @@ else:
     print("-> #%02X #%02X #%02X" % (p[color * 3],
                                     p[(color * 3) + 1],
                                     p[(color * 3) + 2]))
-
+    bcolor = bytes([color])
     # Construct output stream
-    out = b""
+    out = bytearray((len(ciphertext) // opts.pixelwidth) + 1)
+    outi = 0
     outlenfloat = 0.0
     for i in range(len(ciphertext) // opts.blocksize):
         token = ciphertext[
             i * opts.blocksize:(i + 1) * opts.blocksize].hex()
-        if token in colormap:
-            byte = bytes([colormap[token]])
+        if token in bcolormap:
+            byte = bcolormap[token]
         else:
-            byte = bytes([color])
-        out += byte * (opts.blocksize // opts.pixelwidth)
+            byte = bcolor
+        b = opts.blocksize // opts.pixelwidth
+        out[outi:outi+b] = byte * b
+        outi += b
         outlenfloat += float(opts.blocksize) / opts.pixelwidth
         if outlenfloat >= len(out) + 1:
-            out += byte
+            out[outi] = byte
+            outi += 1
 
 if opts.width is None and opts.height is None and opts.ratio is None:
     print("Trying to guess ratio between", end=' ')
@@ -257,7 +261,7 @@ if opts.height is not None:
 print("Size: ", repr(xy))
 
 # Create image from output stream & ratio
-i = Image.frombytes('P', xy, out)
+i = Image.frombytes('P', xy, bytes(out))
 i.putpalette(p)
 
 if opts.flip:
