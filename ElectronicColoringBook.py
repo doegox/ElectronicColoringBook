@@ -57,13 +57,13 @@ options.add_option('-D', '--dontshow', action="store_true",
 
 def histogram(data, blocksize):
     d = {}
-    for k in range(len(data) / blocksize):
-        block = data[k * blocksize:(k + 1) * blocksize].encode('hex')
+    for k in range(len(data) // blocksize):
+        block = data[k * blocksize:(k + 1) * blocksize].hex()
         if block not in d:
             d[block] = 1
         else:
             d[block] += 1
-    return sorted(d.iteritems(), key=operator.itemgetter(1), reverse=True)
+    return sorted(d.items(), key=operator.itemgetter(1), reverse=True)
 
 opts, args = options.parse_args()
 if len(args) < 1:
@@ -72,38 +72,38 @@ if len(args) < 1:
 
 if opts.colors != 16 and opts.palette:
     # Testing against default values to guess if user mixed options...
-    print "Please don't mix -c with -C!"
+    print("Please don't mix -c with -C!")
     sys.exit()
 
 palette = None
 if opts.palette:
     if '#' in opts.palette:
-        opts.colors = len(opts.palette) / 7
+        opts.colors = len(opts.palette) // 7
         palette = []
         for rgb in opts.palette.split('#')[1:]:
             palette.extend(
                 [int(rgb[:2], 16), int(rgb[2:4], 16), int(rgb[4:], 16)])
         opts.palette = ''.join(["%02X" % i for i in range(opts.colors)])
     else:
-        opts.colors = len(opts.palette) / 2
+        opts.colors = len(opts.palette) // 2
 
 if opts.colors < 2:
-    print "Please choose at least two colors"
+    print("Please choose at least two colors")
     sys.exit()
 
 if opts.width is not None and opts.height is not None:
-    print "Please indicate only -x or -y, not both!"
+    print("Please indicate only -x or -y, not both!")
     sys.exit()
 
 if opts.ratio is not None and (opts.width is not None or
                                opts.height is not None):
-    print "Please don't mix -r with -x or -y!"
+    print("Please don't mix -r with -x or -y!")
     sys.exit()
 
 if opts.raw is True and (opts.colors != 16 or opts.blocksize != 16 or
                          opts.groups != 1 or opts.palette):
     # Testing against default values to guess if user mixed options...
-    print "Please don't mix -R with -b, -c, -C or -g!"
+    print("Please don't mix -R with -b, -c, -C or -g!")
     sys.exit()
 
 if opts.output:
@@ -130,7 +130,7 @@ else:
     # Cut histo to discard singletons
     histo = [x for x in histo if x[1] > 1]
     # Cut histo to keep exact multiple of group
-    histo = histo[:len(histo) / opts.groups * opts.groups]
+    histo = histo[:len(histo) // opts.groups * opts.groups]
     if not histo:
         raise NameError("Did not find any single match :-(")
 
@@ -154,7 +154,7 @@ else:
 
     # Let's use random colors = random refs to the colormap...
     colormap = {}
-    for i in range(len(histo) / opts.groups):
+    for i in range(len(histo) // opts.groups):
         if i == 0:
             if opts.palette:
                 color = int(opts.palette[:2], 16)
@@ -167,60 +167,60 @@ else:
                 color = random.randint(1, 254)
         for g in range(opts.groups):
             gi = (i * opts.groups) + g
-            colormap[histo[gi][0]] = chr(color)
-            print "%s %10s #%02X" % (histo[gi][0], histo[gi][1], color),
-            print "-> #%02X #%02X #%02X" % (p[color * 3],
+            colormap[histo[gi][0]] = color
+            print("%s %10s #%02X" % (histo[gi][0], histo[gi][1], color), end=' ')
+            print("-> #%02X #%02X #%02X" % (p[color * 3],
                                             p[(color * 3) + 1],
-                                            p[(color * 3) + 2])
-    blocksleft = len(ciphertext) / opts.blocksize - \
-        reduce(lambda x, y: x + y, [n for (t, n) in histo])
+                                            p[(color * 3) + 2]))
+    blocksleft = len(ciphertext) // opts.blocksize - \
+        sum(n for (t, n) in histo)
     # All other blocks will be painted in black:
     if opts.palette:
         color = int(opts.palette[-2:], 16)
     else:
         color = 255
-    print "%s %10i #%02X" % ("*" * len(histo[0][0]), blocksleft, color),
-    print "-> #%02X #%02X #%02X" % (p[color * 3],
+    print("%s %10i #%02X" % ("*" * len(histo[0][0]), blocksleft, color), end=' ')
+    print("-> #%02X #%02X #%02X" % (p[color * 3],
                                     p[(color * 3) + 1],
-                                    p[(color * 3) + 2])
+                                    p[(color * 3) + 2]))
 
     # Construct output stream
-    out = ""
+    out = b""
     outlenfloat = 0.0
-    for i in range(len(ciphertext) / opts.blocksize):
+    for i in range(len(ciphertext) // opts.blocksize):
         token = ciphertext[
-            i * opts.blocksize:(i + 1) * opts.blocksize].encode('hex')
+            i * opts.blocksize:(i + 1) * opts.blocksize].hex()
         if token in colormap:
-            byte = colormap[token]
+            byte = bytes([colormap[token]])
         else:
-            byte = chr(color)
-        out += byte * (opts.blocksize / opts.pixelwidth)
+            byte = bytes([color])
+        out += byte * (opts.blocksize // opts.pixelwidth)
         outlenfloat += float(opts.blocksize) / opts.pixelwidth
         if outlenfloat >= len(out) + 1:
             out += byte
 
 if opts.width is None and opts.height is None and opts.ratio is None:
-    print "Trying to guess ratio between",
-    print "1:%i and %i:1 ..." % (opts.maxratio, opts.maxratio)
+    print("Trying to guess ratio between", end=' ')
+    print("1:%i and %i:1 ..." % (opts.maxratio, opts.maxratio))
 
     sq = int(math.sqrt(len(out)))
     r = {}
-    print "Width: from %i to %i" % (sq / opts.maxratio, sq * opts.maxratio)
-    print "Sampling: %i" % opts.sampling
-    print "Progress:",
-    for i in range(sq / opts.maxratio, sq * opts.maxratio):
+    print("Width: from %i to %i" % (sq // opts.maxratio, sq * opts.maxratio))
+    print("Sampling: %i" % opts.sampling)
+    print("Progress:")
+    for i in range(sq // opts.maxratio, sq * opts.maxratio):
         if i % 100 == 0:
-            print i,
+            print(i, end=' ')
             sys.stdout.flush()
         A = out[:-i:opts.sampling]
         B = out[i::opts.sampling]
         # How many matches?
 # Shall we skip matches between black blocks?
 #        m=reduce(lambda x,y: x+y,[x and x==y for (x,y) in zip(A,B)])
-        m = reduce(lambda x, y: x + y, [x == y for (x, y) in zip(A, B)])
+        m = sum(x == y for (x, y) in zip(A, B))
         r[i] = float(m) / (len(A))
-    print ""
-    r = sorted(r.iteritems(), key=operator.itemgetter(1), reverse=True)
+    print("")
+    r = sorted(r.items(), key=operator.itemgetter(1), reverse=True)
     opts.width = r[0][0]
 
 if opts.ratio is not None:
@@ -234,12 +234,12 @@ if opts.ratio is not None:
 if opts.width is not None:
     if int(opts.width) != opts.width:
         # Fractional width, little trick...
-        out2=""
+        out2=b""
         frac=opts.width-int(opts.width)
         acc=0
         miss=0
-        print "frac", frac
-        for i in range(len(out) / int(opts.width)):
+        print("frac", frac)
+        for i in range(len(out) // int(opts.width)):
             line=out[i*int(opts.width):(i+1)*int(opts.width)]
             acc+=frac
             if acc > 1:
@@ -248,13 +248,13 @@ if opts.width is not None:
                 miss+=1
             else:
                 out2+=line
-        out=out2+("\xff"*miss)
-    xy = (int(opts.width), len(out) / int(opts.width))
+        out=out2+(b"\xff"*miss)
+    xy = (int(opts.width), len(out) // int(opts.width))
 
 if opts.height is not None:
-    xy = (len(out) / opts.height, opts.height)
+    xy = (len(out) // opts.height, opts.height)
 
-print "Size: ", repr(xy)
+print("Size: ", repr(xy))
 
 # Create image from output stream & ratio
 i = Image.frombytes('P', xy, out)
@@ -278,7 +278,7 @@ if opts.save:
         suffix += "_x%s_y%i" % (repr(opts.width), xy[1])
     else:
         suffix += "_x%i_y%i" % xy
-    print "Saving output into " + opts.output + suffix + '.png'
+    print("Saving output into " + opts.output + suffix + '.png')
     i.save(opts.output + suffix + '.png')
 if not opts.dontshow:
     i.show()
